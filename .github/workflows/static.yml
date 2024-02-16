@@ -1,0 +1,51 @@
+name: Deploy static content to Pages with Javadoc
+
+on:
+  push:
+    branches:
+      - "master"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Generate Javadoc
+        run: |
+          ./gradlew javadoc
+
+      - name: Upload Javadoc artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: javadoc
+          path: build/docs/javadoc
+
+      - name: Upload repository artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: repository
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifacts: javadoc, repository
