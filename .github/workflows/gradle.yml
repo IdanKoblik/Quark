@@ -1,44 +1,51 @@
-name: Generate and Deploy Javadoc
+name: Deploy static content to Pages with Javadoc
 
 on:
   push:
     branches:
-      - master  # Adjust the branch name as needed
+      - "master"
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Java
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '11'  # Adjust the Java version as needed
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-    - name: Build and Generate Javadoc
-      run: ./gradlew javadoc
+      - name: Generate Javadoc
+        run: |
+          ./gradlew javadoc
 
-    - name: Deploy Javadoc
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: './build/docs/javadoc'
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Upload Javadoc artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: javadoc
+          path: build/docs/javadoc
+
+      - name: Upload repository artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: repository
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifacts: javadoc, repository
