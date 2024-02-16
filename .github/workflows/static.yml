@@ -1,51 +1,21 @@
-name: Deploy static content to Pages with Javadoc
+name: Deploy Javadoc
 
 on:
   push:
     branches:
-      - "master"
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+      - master
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # if you have a protection rule on your repository, you'll need to give write permission to the workflow.
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Generate Javadoc
-        run: |
-          ./gradlew javadoc
-
-      - name: Upload Javadoc artifact
-        uses: actions/upload-artifact@v2
+      - name: Deploy JavaDoc 🚀
+        uses: MathieuSoysal/Javadoc-publisher.yml@v2.5.0
         with:
-          name: javadoc
-          path: build/docs/javadoc
-
-      - name: Upload repository artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: repository
-          path: '.'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          artifacts: javadoc, repository
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          javadoc-branch: javadoc
+          java-version: 17
+          target-folder: javadoc 
+          project: gradle
