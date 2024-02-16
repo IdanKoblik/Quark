@@ -1,0 +1,59 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.github.idankoblik'
+version = '0.1'
+
+def jdaVersion = "5.0.0-beta.11"
+def lombokVersion = "1.18.24"
+def guavaVersion = "33.0.0-jre"
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+
+            artifact jar
+        }
+    }
+    repositories {
+        if (project.findProperty("beta.nexus.username") != null) {
+            maven {
+                name = "BetaReleases"
+                url = "https://nexus.voigon.dev/repository/beta-releases/"
+                credentials {
+                    username = project.findProperty("beta.nexus.username")
+                    password = project.findProperty("beta.nexus.password")
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'junit:junit:4.11'
+
+    // Google
+    implementation("com.google.guava:guava:$guavaVersion")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
+    annotationProcessor("org.projectlombok:lombok:$lombokVersion")
+
+    // JDA
+    compileOnly("net.dv8tion:JDA:$jdaVersion")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
