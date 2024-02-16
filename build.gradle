@@ -40,6 +40,7 @@ publishing {
 
 dependencies {
     implementation 'junit:junit:4.11'
+    implementation 'org.mockito:mockito-core:5.10.0'
 
     // Google
     implementation("com.google.guava:guava:$guavaVersion")
@@ -50,6 +51,7 @@ dependencies {
 
     // JDA
     compileOnly("net.dv8tion:JDA:$jdaVersion")
+    testImplementation("net.dv8tion:JDA:$jdaVersion")
 }
 
 java {

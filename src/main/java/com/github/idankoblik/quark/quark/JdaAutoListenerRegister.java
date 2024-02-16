@@ -1,4 +1,4 @@
-package com.github.idankoblik.quark;
+package com.github.idankoblik.quark.quark;
 
 import com.google.common.reflect.ClassPath;
 import net.dv8tion.jda.api.JDABuilder;
